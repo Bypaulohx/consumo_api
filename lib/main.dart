@@ -29,10 +29,31 @@ class ConsultaCepPage extends StatefulWidget {
 
 class _ConsultaCepPageState extends State<ConsultaCepPage> {
 
+  //Pega o Cep digitado pelo usuário
   TextEditingController cepController = TextEditingController();
+  
+  //Variável para armazenar o resultado da consulta
+  String resultado = "";
 
-  void consultarCep(){
-    
+  //Função para consultar o CEP
+  Future<void> consultarCep() async {
+    String url = "https://viacep.com.br/ws/${cepController.text}/json/";
+
+    //Fazendo a requisição HTTP
+    var response = await http.get(Uri.parse(url));
+
+    //Convertendo a resposta para Map
+    Map dados = json.decode(response.body);
+
+    //Atualizando a variável resultado e a Tela
+    setState(() {
+      resultado = "CEP: ${dados['cep']}\n"
+                  "Logradouro: ${dados['logradouro']}\n"
+                  "Bairro: ${dados['bairro']}\n"
+                  "Cidade: ${dados['localidade']}\n"
+                  "Estado: ${dados['uf']}";
+    });
+
   }
 
   Widget build(BuildContext context) {
@@ -55,7 +76,13 @@ class _ConsultaCepPageState extends State<ConsultaCepPage> {
             ),
 
             const SizedBox(height: 20),
+
+            //Botão para consultar o CEP
             ElevatedButton(onPressed: consultarCep, child: const Text("Consultar CEP")),
+
+            const SizedBox(height: 20),
+
+            Text("Resultado da Consulta: $resultado", style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal)),
           ],
         ),
       ),
